@@ -78,7 +78,7 @@ if (count($_POST) > 0) {
 
     // Buscando dados do cliente na base de dados.
     $sql_cliente = "SELECT * FROM clientes WHERE id = $id";
-    $query_cliente = $mysqli->query($sql_cliente) or die($mysqli->connect_error);
+    $query_cliente = $mysqli->query($sql_cliente) or die($mysqli->error);
     $cliente = $query_cliente->fetch_assoc();
 
 ?>
@@ -108,12 +108,12 @@ if (count($_POST) > 0) {
 
         <p>
             <label>Telefone:</label>
-            <input value="<?php echo formatar_telefone($cliente['telefone']); ?>" placeholder="(11) 98888-8888" name="telefone" type="text">
+            <input value="<?php if(!empty($cliente['telefone'])) echo formatar_telefone($cliente['telefone']); ?>" placeholder="(11) 98888-8888" name="telefone" type="text">
         </p>
 
         <p>
             <label>Data de nascimento:</label>
-            <input value="<?php echo formatar_data($cliente['nascimento']); ?>" placeholder="DD/MM/AAAA" name="dt_Nascimento" type="text">
+            <input value="<?php if(!empty($cliente['nascimento'])) echo formatar_data($cliente['nascimento']); ?>" placeholder="DD/MM/AAAA" name="dt_Nascimento" type="text">
         </p>
 
         <p>
