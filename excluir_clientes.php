@@ -1,12 +1,14 @@
 <?php
 
-// importando arquivo
+// importando arquivo.
 include("conexao.php");
 
+// Coletando ID do cliente.
 $id = intval($_GET['id']);
 
 if (isset($_POST['confirmar'])) {
 
+    // Deletando cliente da base de dados.
     $sql_code = "DELETE FROM clientes WHERE id = $id";
     $deu_certo = $mysqli->query($sql_code) or die ($mysqli->error);
 
