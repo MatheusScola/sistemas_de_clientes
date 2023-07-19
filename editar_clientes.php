@@ -6,7 +6,7 @@ function limpar_texto($str){
 }
 
 // importando arquivo
-include('conexao.php');
+include('lib/conexao.php');
 
 // Coletando ID do cliente
 $id = intval($_GET['id']);
@@ -85,7 +85,7 @@ if (count($_POST) > 0) {
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

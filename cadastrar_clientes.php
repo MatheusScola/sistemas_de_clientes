@@ -9,7 +9,8 @@ function limpar_texto($str){
 if(count($_POST) > 0){
 
     // importando arquivos
-    include('conexao.php');
+    include('lib/conexao.php');
+    include('lib/upload.php');
     include("lib/mail.php");
 
     // Criando variáveis com os dados do cliente
@@ -19,7 +20,6 @@ if(count($_POST) > 0){
     $dt_Nascimento = $_POST['dt_Nascimento'];
     $telefone = $_POST['telefone'];
     $password = $_POST['senha'];
-
 
     // Conferindo campos preenchidos pelo usuário
     if (empty($nome) || strlen($nome) < 3 ){
@@ -55,19 +55,31 @@ if(count($_POST) > 0){
         }
     }
 
-    if(strlen($password) < 6 && strlen($password) > 16) {
+    if (strlen($password) < 6 && strlen($password) > 16) {
         $erro = "A senha deve ter entre 6 e 16 caracteres!";
+    } else {
+        // Criptografando a senha do cliente.
+        $encrypted_password = password_hash($password, PASSWORD_DEFAULT);
     }
 
-    // Criptografando a senha do cliente.
-    $encrypted_password = password_hash($password, PASSWORD_DEFAULT);
+    $path = "";
+    if (isset($_FILES['foto'])) {
+        $foto = $_FILES['foto'];
+        
+        // Conferindo se a foto é válida.
+        $path = verificarArquivo($foto['error'], $foto['size'], $foto['name'], $foto['tmp_name']);
+
+        if(!$path) {
+            $erro = "Erro ao enviar arquivo da foto!";
+        }
+    }
 
     if ($erro) {
         echo "<p><b>ERRO: $erro</b></p>";
 
     } else {
         // Inserção dos dados do cliente na base de dados
-        $sql_code = "INSERT INTO clientes (nome, email, senha , nascimento, telefone, cadastro) VALUES ('$nome', '$email', '$encrypted_password' , '$dt_Nascimento', '$telefone', NOW())";
+        $sql_code = "INSERT INTO clientes (nome, foto, email, senha , nascimento, telefone, cadastro) VALUES ('$nome', '$path', '$email', '$encrypted_password' , '$dt_Nascimento', '$telefone', NOW())";
         $deu_certo = $mysqli->query($sql_code) or die($mysqli->error);
 
         if($deu_certo) {
@@ -107,7 +119,7 @@ if(count($_POST) > 0){
 </head>
 <body>
     <a href="clientes.php">Voltar para a lista de clientes</a>
-    <form method="POST" action="">
+    <form method="POST" enctype="multipart/form-data">
 
         <p>
             <label>Nome:</label>
@@ -133,6 +145,11 @@ if(count($_POST) > 0){
         <p>
             <label>Senha:</label>
             <input value="<?php if(isset($_POST['senha'])) echo $_POST['senha']; ?>" name="senha" type="text">
+        </p>
+
+        <p>
+            <label>Foto do cliente:</label>
+            <input name="foto" type="file">
         </p>
 
         <p>

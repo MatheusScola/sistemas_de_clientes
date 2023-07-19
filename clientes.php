@@ -2,7 +2,7 @@
 
 // Coletando dados da base de dados.
 
-include("conexao.php");
+include("lib/conexao.php");
 
 $sql_code = "SELECT * FROM clientes ORDER BY id ASC ";
 $query_clientes = $mysqli->query($sql_code) or die($mysqli->error);
@@ -11,7 +11,7 @@ $num_clientes = $query_clientes->num_rows;
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
