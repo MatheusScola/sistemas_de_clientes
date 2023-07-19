@@ -27,10 +27,10 @@ function send_email($Address, $subJect, $bodyHTML ) {
     $mail->SMTPAuth = true;
 
     // Definindo o nome do usuário.
-    $mail->Username = 'matheus.fernan01@gmail.com';
+    $mail->Username = '';
 
     // Definindo a senha.
-    $mail->Password = 'ozimhxywppvbtizs';
+    $mail->Password = '';
 
     // Definindo a segurança do E-mail.
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
@@ -42,7 +42,7 @@ function send_email($Address, $subJect, $bodyHTML ) {
     $mail->CharSet = 'UTF-8';
 
     // Definindo o remetente do E-mail.
-    $mail->setFrom('matheus.fernan01@gmail.com.br', 'Matheus Fernandes');
+    $mail->setFrom('', 'Matheus Fernandes');
 
     // Definindo destinatário.
     $mail->addAddress($Address);
