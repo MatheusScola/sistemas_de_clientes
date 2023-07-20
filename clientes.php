@@ -20,11 +20,12 @@ $num_clientes = $query_clientes->num_rows;
 <body>
     
     <h1>Lista de Clientes</h1>
-    <p>Esses são os clientes cadastrados no seu sistema:</p>
+    <p><a href="cadastrar_clientes.php">Cadastrar novo cliente</a></p>
 
     <table border="1" cellpadding = "10">
         <thead>
             <th>ID</th>
+            <th>Foto</th>
             <th>Nome</th>
             <th>E-mail</th>
             <th>Telefone</th>
@@ -47,6 +48,7 @@ $num_clientes = $query_clientes->num_rows;
                     $Dt_cadastro = "Não informado";
                     $Dt_nascimento = "Não informado";
                     $telefone = "Não informado";
+                    $foto = "Não informada";
 
                     // Tratando as variáveis.
 
@@ -54,22 +56,27 @@ $num_clientes = $query_clientes->num_rows;
                         $telefone = formatar_telefone($cliente['telefone']);
                     }
 
-                    if(!empty($cliente['nascimento'])) {
+                    if(!empty($cliente['nascimento']) && $cliente['nascimento'] != "0000-00-00") {
                         $Dt_nascimento = formatar_data($cliente['nascimento']);
                     }
 
                     if(!empty($cliente['cadastro'])) {
                         $Dt_cadastro = date("d/m/Y H:i", strtotime($cliente['cadastro']));
                     }
+
+                    if(!empty($cliente['foto'])) {
+                        $foto = $cliente['foto'];
+                    }
                 ?>
                 <tr>
                     <!-- Exibindo os dados dos clientes -->
 
                     <td style="text-align: center;"><?php echo $cliente['id'] ?></td>
+                    <td><img height="50" src="<?php echo $cliente['foto']; ?>"></td>
                     <td><?php echo $cliente['nome'] ?></td>
                     <td><?php echo $cliente['email'] ?></td>
                     <td><?php echo $telefone ?></td>
-                    <td><?php echo $Dt_nascimento ?></td>
+                    <td style="text-align: center;" ><?php echo $Dt_nascimento ?></td>
                     <td><?php echo $Dt_cadastro ?></td>
                     <td><a href="editar_clientes.php?id=<?php echo $cliente['id'] ?>">Editar</a> <a href="excluir_clientes.php?id=<?php echo $cliente['id'] ?>">Deletar</a></td> <!-- Criando links das páginas de manipulação do cliente. -->
                 

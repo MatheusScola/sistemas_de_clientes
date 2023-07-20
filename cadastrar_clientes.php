@@ -42,7 +42,6 @@ if(count($_POST) > 0){
         } else {
             $erro = "A data de nascimento deve seguir o padrão: DD/MM/AAAA";
         }
-
     }
 
     if (!empty($telefone)) {
@@ -63,7 +62,7 @@ if(count($_POST) > 0){
     }
 
     $path = "";
-    if (isset($_FILES['foto'])) {
+    if (!empty($_FILES['foto']['name'])) {
         $foto = $_FILES['foto'];
         
         // Conferindo se a foto é válida.

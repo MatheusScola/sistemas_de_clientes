@@ -19,10 +19,9 @@ if (count($_POST) > 0) {
     $email = $_POST['email'];
     $dt_Nascimento = $_POST['dt_Nascimento'];
     $telefone = $_POST['telefone'];
-
+    $password = $_POST['senha'];
 
     // Conferindo campos preenchidos pelo usuário
-
     if (empty($nome) || strlen($nome) < 3 ){
         $erro =  "Preencha o campo 'nome'<br>";
     }
@@ -34,21 +33,19 @@ if (count($_POST) > 0) {
     if (!empty($dt_Nascimento)) {
         if (strlen($dt_Nascimento) != 10) {
             $erro = "A data de nascimento deve seguir o padrão: DD/MM/AAAA";
-        } 
+        }
         // Convertendo o formato da data para guardar na base de dados. ( BR --> EUA )
-
         $pedacos = explode('/', $dt_Nascimento);
+
         if (count($pedacos) == 3) {
             $dt_Nascimento = implode('-', array_reverse($pedacos));
         } else {
             $erro = "A data de nascimento deve seguir o padrão: DD/MM/AAAA";
         }
-
     }
 
     if (!empty($telefone)) {
         // Deixando somente números na variável do telefone
-
         $telefone = limpar_texto($telefone);
 
         if (strlen($telefone) != 11) {
@@ -56,17 +53,31 @@ if (count($_POST) > 0) {
         }
     }
 
+    $change_Password = False;
+    if (!empty($password)) {
+        if (strlen($password) < 6 && strlen($password) > 16) {
+            $erro = "A senha deve ter entre 6 e 16 caracteres!";
+            
+        } else {
+            // Criptografando a nova senha do cliente.
+            $encrypted_password = password_hash($password, PASSWORD_DEFAULT);
+            $change_Password = True;
+
+        }
+    }
+
     if ($erro) {
         echo "<p><b>ERRO: $erro</b></p>";
     } else {
-        
+
+        // Incluindo código SQL extra caso a senha seja modificada.
+        $sql_code_extra = "";
+        if($change_Password) {
+            $sql_code_extra = "senha = '$encrypted_password',";
+        }
+
         // Alterando dados do cliente na base de dados.
-        $sql_code = "UPDATE clientes
-        SET nome = '$nome',
-        email = '$email',
-        nascimento = '$dt_Nascimento',
-        telefone = '$telefone'
-        WHERE id = '$id'";
+        $sql_code = "UPDATE clientes SET nome = '$nome', $sql_code_extra email = '$email', nascimento = '$dt_Nascimento', telefone = '$telefone' WHERE id = '$id'";
         $deu_certo = $mysqli->query($sql_code) or die($mysqli->error);
         
         if ($deu_certo) {
@@ -89,7 +100,7 @@ if (count($_POST) > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastar clientes</title>
+    <title>Editar clientes</title>
 </head>
 <body>
     <a href="clientes.php">Voltar para a lista de clientes</a>
@@ -113,7 +124,23 @@ if (count($_POST) > 0) {
 
         <p>
             <label>Data de nascimento:</label>
-            <input value="<?php if(!empty($cliente['nascimento'])) echo formatar_data($cliente['nascimento']); ?>" placeholder="DD/MM/AAAA" name="dt_Nascimento" type="text">
+            <input value="<?php if(!empty($cliente['nascimento'])) echo formatar_data($cliente['nascimento']) ?>" placeholder="DD/MM/AAAA" name="dt_Nascimento" type="text">
+        </p>
+
+        <p>
+            <label>Senha:</label>
+            <input name="senha" type="text">
+        </p>
+
+        <?php if($cliente['foto']) { ?>
+        <p>
+            <label>Foto atual:</label><br>
+            <img height="50"  src="<?php echo $cliente['foto']; ?>">
+        </p>
+        <?php } ?>
+        <p>
+            <label>Nova foto do cliente:</label>
+            <input name="foto" type="file">
         </p>
 
         <p>
