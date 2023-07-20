@@ -86,7 +86,9 @@ if (count($_POST) > 0) {
         $cliente = $query_cliente->fetch_assoc();
 
         // Excluindo foto antiga do cliente.
-        unlink($cliente['foto']);
+        if (!empty($cliente['foto'])) {
+            unlink($cliente['foto']);
+        }
     }
 
     if ($erro) {
@@ -123,11 +125,11 @@ if (count($_POST) > 0) {
                 
                 // Enviando e-mail para cliente cadastrado.
                 $email_enviado = send_email($email, "Cadastro realizado!", $text_email); 
-            }    
             
-            if(!$email_enviado){
-                echo $email_enviado;
+                if(!$email_enviado){
+                    echo $email_enviado;
 
+                }
             }
             unset ($_POST);
         }

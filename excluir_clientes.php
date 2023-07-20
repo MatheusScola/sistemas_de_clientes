@@ -6,13 +6,24 @@ include("lib/conexao.php");
 // Coletando ID do cliente.
 $id = intval($_GET['id']);
 
+// Buscando foto do cliente na base de dados.
+$sql_cliente = "SELECT foto FROM clientes WHERE id = $id";
+$query_cliente = $mysqli->query($sql_cliente) or die($mysqli->error);
+$cliente = $query_cliente->fetch_assoc();
+
 if (isset($_POST['confirmar'])) {
 
     // Deletando cliente da base de dados.
     $sql_code = "DELETE FROM clientes WHERE id = $id";
     $deu_certo = $mysqli->query($sql_code) or die ($mysqli->error);
+    
+    if ($deu_certo) { 
+        
+        // Apagando foto do cliente.
+        if (!empty($cliente['foto'])) {
+            unlink($cliente['foto']);
+        }?>
 
-    if ($deu_certo) { ?>
         <h1>Cliente deletado com sucesso!</h1>
         <p><a href="clientes.php">Clique aqui</a> para voltar para a lista de clientes.</p>
         <?php
