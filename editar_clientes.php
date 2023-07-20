@@ -5,8 +5,10 @@ function limpar_texto($str){
     return preg_replace("/[^0-9]/","",$str);
 }
 
-// importando arquivo
+// importando arquivos
 include('lib/conexao.php');
+include('lib/upload.php');
+include('lib/mail.php');
 
 // Coletando ID do cliente
 $id = intval($_GET['id']);
@@ -66,6 +68,27 @@ if (count($_POST) > 0) {
         }
     }
 
+    $alterou_foto = False;
+    if (!empty($_FILES['foto']['name'])) {
+        $foto = $_FILES['foto'];
+        
+        // Conferindo se a foto é válida.
+        $path = verificarArquivo($foto['error'], $foto['size'], $foto['name'], $foto['tmp_name']);
+        $alterou_foto = True;
+
+        if(!$path) {
+            $erro = "Erro ao enviar arquivo da foto!";
+        }
+
+        // Buscando foto antiga do cliente na base de dados.
+        $sql_cliente = "SELECT foto FROM clientes WHERE id = $id";
+        $query_cliente = $mysqli->query($sql_cliente) or die($mysqli->error);
+        $cliente = $query_cliente->fetch_assoc();
+
+        // Excluindo foto antiga do cliente.
+        unlink($cliente['foto']);
+    }
+
     if ($erro) {
         echo "<p><b>ERRO: $erro</b></p>";
     } else {
@@ -76,12 +99,36 @@ if (count($_POST) > 0) {
             $sql_code_extra = "senha = '$encrypted_password',";
         }
 
+        if($alterou_foto) {
+            $sql_code_extra .= "foto = '$path', ";
+        }
+
         // Alterando dados do cliente na base de dados.
         $sql_code = "UPDATE clientes SET nome = '$nome', $sql_code_extra email = '$email', nascimento = '$dt_Nascimento', telefone = '$telefone' WHERE id = '$id'";
         $deu_certo = $mysqli->query($sql_code) or die($mysqli->error);
         
         if ($deu_certo) {
             echo "<p><b>Cliente atualizado com sucesso!!!</b></p>";
+
+            if ($change_Password){
+                // Montando texto que será enviado ao cliente caso o a senha tenha sido alterada.
+                $text_email =
+                "<h1>Olá, $nome!</h1>
+                <p>Sua senha foi atualizada!</p>
+                <p>
+                    <b>Login:</b> $email<br>
+                    <b>Senha:</b> $password<br>
+                </p>
+                <p>Para fazer o seu login <a href=\"https://SitedeTeste.com/login.php\">clique aqui.</a></p>";
+                
+                // Enviando e-mail para cliente cadastrado.
+                $email_enviado = send_email($email, "Cadastro realizado!", $text_email); 
+            }    
+            
+            if(!$email_enviado){
+                echo $email_enviado;
+
+            }
             unset ($_POST);
         }
     }
@@ -104,7 +151,7 @@ if (count($_POST) > 0) {
 </head>
 <body>
     <a href="clientes.php">Voltar para a lista de clientes</a>
-    <form method="POST" action="">
+    <form method="POST" enctype="multipart/form-data">
 
         <p>
             <label>Nome:</label>
@@ -124,7 +171,7 @@ if (count($_POST) > 0) {
 
         <p>
             <label>Data de nascimento:</label>
-            <input value="<?php if(!empty($cliente['nascimento'])) echo formatar_data($cliente['nascimento']) ?>" placeholder="DD/MM/AAAA" name="dt_Nascimento" type="text">
+            <input value="<?php if(!empty($cliente['nascimento']) && $cliente['nascimento'] != "0000-00-00" ) echo formatar_data($cliente['nascimento']) ?>" placeholder="DD/MM/AAAA" name="dt_Nascimento" type="text">
         </p>
 
         <p>

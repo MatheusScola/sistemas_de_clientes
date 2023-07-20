@@ -100,7 +100,7 @@ if(count($_POST) > 0){
             if(!$email_enviado){
                 echo $email_enviado;
 
-            };
+            }
             unset($_POST);
         }
     }
