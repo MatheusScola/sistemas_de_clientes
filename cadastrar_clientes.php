@@ -1,6 +1,18 @@
 <?php
 
 
+// Conferindo se existe alguma sessão iniciada.
+if(!isset($_SESSION)) {
+    // Criando nova sessão
+    session_start();
+}
+
+// Conferindo se o cliente logado é um Administrador.
+if (!isset($_SESSION['admin']) || !$_SESSION['admin'] ) {
+    header(("Location: clientes.php"));
+    die();
+}
+
 // Função para formatar telefone
 function limpar_texto($str){
     return preg_replace("/[^0-9]/","",$str);
@@ -20,6 +32,7 @@ if(count($_POST) > 0){
     $dt_Nascimento = $_POST['dt_Nascimento'];
     $telefone = $_POST['telefone'];
     $password = $_POST['senha'];
+    $funcao = $_POST['admin'];
 
     // Conferindo campos preenchidos pelo usuário
     if (empty($nome) || strlen($nome) < 3 ){
@@ -78,7 +91,7 @@ if(count($_POST) > 0){
 
     } else {
         // Inserção dos dados do cliente na base de dados
-        $sql_code = "INSERT INTO clientes (nome, foto, email, senha , nascimento, telefone, cadastro) VALUES ('$nome', '$path', '$email', '$encrypted_password' , '$dt_Nascimento', '$telefone', NOW())";
+        $sql_code = "INSERT INTO clientes (nome, foto, email, senha , nascimento, telefone, cadastro, admin) VALUES ('$nome', '$path', '$email', '$encrypted_password' , '$dt_Nascimento', '$telefone', NOW(), $funcao)";
         $deu_certo = $mysqli->query($sql_code) or die($mysqli->error);
 
         if($deu_certo) {
@@ -149,6 +162,12 @@ if(count($_POST) > 0){
         <p>
             <label>Foto do cliente:</label>
             <input name="foto" type="file">
+        </p>
+
+        <p>
+            <label>Tipo:</label>
+            <label><input name="admin" value="1" type="radio">ADMIN</label>
+            <label><input name="admin" value="0" checked type="radio"> CLIENTE</label>
         </p>
 
         <p>

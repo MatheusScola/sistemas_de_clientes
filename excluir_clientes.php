@@ -1,5 +1,17 @@
 <?php
 
+// Conferindo se existe alguma sessão iniciada.
+if(!isset($_SESSION)) {
+    // Criando nova sessão
+    session_start();
+}
+
+// Conferindo se o cliente logado é um Administrador.
+if (!isset($_SESSION['admin']) || !$_SESSION['admin'] ) {
+    header(("Location: clientes.php"));
+    die();
+}
+
 // importando arquivo.
 include("lib/conexao.php");
 

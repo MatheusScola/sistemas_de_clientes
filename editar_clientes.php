@@ -1,5 +1,18 @@
 <?php
 
+
+// Conferindo se existe alguma sessão iniciada.
+if(!isset($_SESSION)) {
+    // Criando nova sessão
+    session_start();
+}
+
+// Conferindo se o cliente logado é um Administrador.
+if (!isset($_SESSION['admin']) || !$_SESSION['admin'] ) {
+    header(("Location: clientes.php"));
+    die();
+}
+
 // Função para formatar telefone
 function limpar_texto($str){
     return preg_replace("/[^0-9]/","",$str);
@@ -22,6 +35,7 @@ if (count($_POST) > 0) {
     $dt_Nascimento = $_POST['dt_Nascimento'];
     $telefone = $_POST['telefone'];
     $password = $_POST['senha'];
+    $funcao = $_POST['admin'];
 
     // Conferindo campos preenchidos pelo usuário
     if (empty($nome) || strlen($nome) < 3 ){
@@ -86,7 +100,7 @@ if (count($_POST) > 0) {
         $cliente = $query_cliente->fetch_assoc();
 
         // Excluindo foto antiga do cliente.
-        if (!empty($cliente['foto'])) {
+        if (!empty($cliente['foto']) && $cliente['foto'] != "arquivos/usuario.jpg" ) {
             unlink($cliente['foto']);
         }
     }
@@ -106,7 +120,7 @@ if (count($_POST) > 0) {
         }
 
         // Alterando dados do cliente na base de dados.
-        $sql_code = "UPDATE clientes SET nome = '$nome', $sql_code_extra email = '$email', nascimento = '$dt_Nascimento', telefone = '$telefone' WHERE id = '$id'";
+        $sql_code = "UPDATE clientes SET nome = '$nome', $sql_code_extra email = '$email', nascimento = '$dt_Nascimento', telefone = '$telefone', admin = '$funcao' WHERE id = '$id'";
         $deu_certo = $mysqli->query($sql_code) or die($mysqli->error);
         
         if ($deu_certo) {
@@ -190,6 +204,12 @@ if (count($_POST) > 0) {
         <p>
             <label>Nova foto do cliente:</label>
             <input name="foto" type="file">
+        </p>
+
+        <p>
+            <label>Tipo:</label>
+            <label><input name="admin" value="1" type="radio">ADMIN</label>
+            <label><input name="admin" value="0" type="radio"> CLIENTE</label>
         </p>
 
         <p>
